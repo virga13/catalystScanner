@@ -1,0 +1,50 @@
+[
+  {
+    "id": "demo-1",
+    "source": "Demo",
+    "headline": "Company A beats Q2 EPS and raises full-year guidance",
+    "body": "Revenue up 18% YoY, operating margin expands 120bps.",
+    "tickers": [
+      "AAPL"
+    ],
+    "url": "https://example.com/aapl-earnings",
+    "sentiment": 0.6,
+    "published_at": "2025-01-20T13:45:00Z"
+  },
+  {
+    "id": "demo-2",
+    "source": "Demo",
+    "headline": "Company B downgraded to Neutral by Major Broker; price target trimmed",
+    "body": "Cites valuation concerns and slowing unit growth.",
+    "tickers": [
+      "TSLA"
+    ],
+    "url": "https://example.com/tsla-downgrade",
+    "sentiment": -0.3,
+    "published_at": "2025-01-21T09:15:00Z"
+  },
+  {
+    "id": "demo-3",
+    "source": "Demo",
+    "headline": "Biotech C receives FDA approval for lead candidate XYZ-101",
+    "body": "Approval covers adult patients; launch slated for Q2.",
+    "tickers": [
+      "BIOT"
+    ],
+    "url": "https://example.com/biot-fda",
+    "sentiment": 0.8,
+    "published_at": "2025-01-22T11:05:00Z"
+  },
+  {
+    "id": "demo-4",
+    "source": "Demo",
+    "headline": "Company D to acquire E in all-stock merger valued at $15B",
+    "body": "Deal expected to close in H2, subject to approvals.",
+    "tickers": [
+      "META"
+    ],
+    "url": "https://example.com/meta-mna",
+    "sentiment": 0.5,
+    "published_at": "2025-01-23T07:30:00Z"
+  }
+]
