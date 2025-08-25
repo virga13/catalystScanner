@@ -27,3 +27,8 @@ class SignalOut(BaseModel):
     url: str | None
     source: str
     created_at: datetime
+    price_at_publish: float | None
+    rvol: float | None
+    premarket: bool
+
+    created_at: datetime

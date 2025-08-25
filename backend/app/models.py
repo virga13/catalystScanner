@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, Float
 from sqlalchemy.sql import func
 from .db import Base
+from sqlalchemy import Boolean
+
 
 class NewsEvent(Base):
     __tablename__ = "news_events"
@@ -27,4 +29,9 @@ class Signal(Base):
     playbook_hint = Column(String(256), nullable=True)
     url = Column(String(1024), nullable=True)
     source = Column(String(64), index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    price_at_publish = Column(Float, nullable=True)
+    rvol = Column(Float, nullable=True)
+    premarket = Column(Boolean, nullable=False, default=False)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())

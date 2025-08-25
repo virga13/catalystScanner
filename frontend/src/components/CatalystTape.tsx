@@ -11,6 +11,9 @@ type Signal = {
   url?: string
   source: string
   created_at: string
+  price_at_publish?: number | null
+  rvol?: number | null
+  premarket: boolean
 }
 
 export default function CatalystTape({ apiUrl, minScore, tickers, limit }: { apiUrl: string, minScore: number, tickers: string, limit: number }) {
@@ -47,6 +50,12 @@ export default function CatalystTape({ apiUrl, minScore, tickers, limit }: { api
               <div style={{fontWeight:600}}>
                 {sig.tickers && <span className="muted">[{sig.tickers}] </span>}
                 {sig.url ? <a href={sig.url} target="_blank" rel="noreferrer">{sig.headline}</a> : sig.headline}
+                <div className="muted" style={{fontSize:12}}>
+                {new Date(sig.created_at).toLocaleString()} • {sig.source} • {sig.playbook_hint || ''}
+                {typeof sig.price_at_publish === 'number' && <> • ${sig.price_at_publish.toFixed(2)}</>}
+                {typeof sig.rvol === 'number' && <> • RVOL {sig.rvol.toFixed(2)}</>}
+                {sig.premarket && <> • premarket</>}
+              </div>
               </div>
               <div className="muted" style={{fontSize:12}}>{new Date(sig.created_at).toLocaleString()} • {sig.source} • {sig.playbook_hint || ''}</div>
             </div>
