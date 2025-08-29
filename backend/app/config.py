@@ -4,6 +4,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "dev"
     WATCHLIST: str = "AAPL,MSFT,NVDA,TSLA"
     ALPHA_VANTAGE_API_KEY: str | None = None
+    FINNHUB_API_KEY: str | None = None
     DEMO_MODE: bool = True
 
     POSTGRES_USER: str = "postgres"

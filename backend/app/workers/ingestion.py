@@ -11,7 +11,7 @@ from ..services.scoring import score_event
 from ..utils.normalizer import NormalizedEvent, tickers_to_str
 from .alpha_vantage import fetch_alpha_news
 from .market_data_alpha import fetch_intraday_1min, calc_rvol, last_price, is_us_premarket
-
+from .finnhub import fetch_company_news
 
 import json
 import contextlib
@@ -75,6 +75,52 @@ async def ingest_alpha_vantage():
         except Exception as e:
             print("Alpha Vantage ingestion error:", e)
             return 0
+        
+async def ingest_finnhub():
+    from ..config import settings
+    if not getattr(settings, "FINNHUB_API_KEY", None):
+        return 0
+    WATCHLIST = [s.strip().upper() for s in settings.WATCHLIST.split(",") if s.strip()]
+    inserted = 0
+    from ..db import SessionLocal
+    from ..models import NewsEvent, Signal
+    from ..services.classify import classify_event, playbook_for
+    from ..services.scoring import score_event
+    from ..utils.normalizer import tickers_to_str
+    from dateutil import parser as dtparser
+
+    for sym in WATCHLIST[:10]:  # be kind to free limits
+        try:
+            items = await fetch_company_news(settings.FINNHUB_API_KEY, sym, days=1)
+        except Exception as e:
+            print("Finnhub fetch error:", e); continue
+        with SessionLocal() as db:
+            for it in items:
+                headline = it.get("headline") or ""
+                url = it.get("url")
+                published_at = datetime.fromtimestamp(it.get("datetime", 0), tz=timezone.utc)
+                event_type = classify_event(headline, it.get("summary"))
+                ev = NewsEvent(
+                    provider_id=url, source="Finnhub", headline=headline,
+                    body=it.get("summary") or None, tickers=tickers_to_str([sym]),
+                    url=url, event_type=event_type, sentiment=None, published_at=published_at
+                )
+                exists = db.query(NewsEvent).filter(
+                    NewsEvent.provider_id==ev.provider_id, NewsEvent.source==ev.source
+                ).first()
+                if exists: continue
+                db.add(ev); db.commit(); db.refresh(ev)
+
+                # minimal context for score (RVOL can still come from AV or skip)
+                score = score_event(event_type, None, published_at, rvol=None, premarket=False)
+                sig = Signal(
+                    event_id=ev.id, event_type=event_type, headline=headline,
+                    tickers=ev.tickers, score=score, playbook_hint=playbook_for(event_type),
+                    url=ev.url, source=ev.source
+                )
+                db.add(sig); db.commit(); inserted += 1
+    return inserted
+        
 
 def load_demo_events():
     path = os.path.join(os.path.dirname(__file__), "../../sample_data/sample_events.json")
@@ -136,10 +182,15 @@ async def main_loop():
     print(f"Starting ingestion loop. Watchlist: {WATCHLIST}. Demo: {settings.DEMO_MODE}")
     while True:
         total = 0
+        
         if settings.ALPHA_VANTAGE_API_KEY:
-            total += await ingest_alpha_vantage()   # no db arg
+            total += await ingest_alpha_vantage()   
+        if settings.FINNHUB_API_KEY:
+            total += await ingest_finnhub()
+            if not settings.FINNHUB_API_KEY:
+                return 0   
         if settings.DEMO_MODE:
-            total += await ingest_demo()           # no db arg
+            total += await ingest_demo()          
         if total:
             print(f"Inserted {total} signals.")
         await asyncio.sleep(interval)
