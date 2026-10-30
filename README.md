@@ -1,6 +1,6 @@
 # Catalyst Scanner (MVP)
 
-A minimal **News/Catalyst Scanner** to support **day trading** workflows:
+A minimal **News/Catalyst Scanner** to support news ingestion workflows:
 - Ingests headlines from **Alpha Vantage News & Sentiment** (free) and provides a plug-in slot for SEC filings.
 - **Normalizes**, **classifies**, **scores** events, stores them in **Postgres**.
 - Serves a **REST API** via **FastAPI**.
